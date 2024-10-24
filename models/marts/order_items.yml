@@ -45,7 +45,7 @@ semantic_models:
     defaults:
       agg_time_dimension: ordered_at
     description: |
-      Items contatined in each order. The grain of the table is one row per order item.
+      Items contained in each order. The grain of the table is one row per order item.
     model: ref('order_items')
     entities:
       - name: order_item
@@ -73,11 +73,11 @@ semantic_models:
         agg: sum
         expr: product_price
       - name: food_revenue
-        description: The revenue generated for each order item. Revenue is calculated as a sum of revenue associated with each product in an order.
+        description: The revenue generated for food items.
         agg: sum
         expr: case when is_food_item is true then product_price else 0 end
       - name: drink_revenue
-        description: The revenue generated for each order item. Revenue is calculated as a sum of revenue associated with each product in an order.
+        description: The revenue generated for drink items.
         agg: sum
         expr: case when is_drink_item is true then product_price else 0 end
       - name: median_revenue
@@ -86,7 +86,6 @@ semantic_models:
         expr: product_price
 
 metrics:
-  # Simple metrics
   - name: revenue
     description: Sum of the product revenue for each order item. Excludes tax.
     type: simple
@@ -117,8 +116,6 @@ metrics:
     type: simple
     type_params:
       measure: drink_revenue
-
-  # Ratio Metrics
   - name: food_revenue_pct
     description: The % of order revenue from food.
     label: Food Revenue %
@@ -133,14 +130,12 @@ metrics:
     type_params:
       numerator: drink_revenue
       denominator: revenue
-
-  # Derived Metrics
   - name: revenue_growth_mom
-    description: "Percentage growth of revenue compared to 1 month ago. Excluded tax"
+    description: "Percentage growth of revenue compared to 1 month ago. Excludes tax"
     type: derived
     label: Revenue Growth % M/M
     type_params:
-      expr: (current_revenue - revenue_prev_month)*100/revenue_prev_month
+      expr: (current_revenue - revenue_prev_month) * 100 / revenue_prev_month
       metrics:
         - name: revenue
           alias: current_revenue
@@ -157,8 +152,6 @@ metrics:
         - name: revenue
         - name: order_cost
           alias: cost
-
-  #Cumulative Metrics
   - name: cumulative_revenue
     description: The cumulative revenue for all orders.
     label: Cumulative Revenue (All Time)
