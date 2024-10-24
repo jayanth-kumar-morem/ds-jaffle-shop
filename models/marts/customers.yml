@@ -1,50 +1,50 @@
 models:
-  - name: customers
-    description: Customer overview data mart, offering key details for each unique customer. One row per customer.
+  - name: blessed_users
+    description: Blessed user overview data mart, offering key details for each unique blessed user. One row per blessed user.
     data_tests:
       - dbt_utils.expression_is_true:
           expression: "lifetime_spend_pretax + lifetime_tax_paid = lifetime_spend"
     columns:
-      - name: customer_id
+      - name: blessed_user_id
         description: The unique key of the orders mart.
         data_tests:
           - not_null
           - unique
-      - name: customer_name
-        description: Customers' full name.
+      - name: blessed_user_name
+        description: Blessed users' full name.
       - name: count_lifetime_orders
-        description: Total number of orders a customer has ever placed.
+        description: Total number of orders a blessed user has ever placed.
       - name: first_ordered_at
-        description: The timestamp when a customer placed their first order.
+        description: The timestamp when a blessed user placed their first order.
       - name: last_ordered_at
-        description: The timestamp of a customer's most recent order.
+        description: The timestamp of a blessed user's most recent order.
       - name: lifetime_spend_pretax
-        description: The sum of all the pre-tax subtotals of every order a customer has placed.
+        description: The sum of all the pre-tax subtotals of every order a blessed user has placed.
       - name: lifetime_tax_paid
-        description: The sum of all the tax portion of every order a customer has placed.
+        description: The sum of all the tax portion of every order a blessed user has placed.
       - name: lifetime_spend
-        description: The sum of all the order totals (including tax) that a customer has ever placed.
-      - name: customer_type
-        description: Options are 'new' or 'returning', indicating if a customer has ordered more than once or has only placed their first order to date.
+        description: The sum of all the order totals (including tax) that a blessed user has ever placed.
+      - name: blessed_user_type
+        description: Options are 'new' or 'returning', indicating if a blessed user has ordered more than once or has only placed their first order to date.
         data_tests:
           - accepted_values:
               values: ["new", "returning"]
 
 semantic_models:
-  - name: customers
+  - name: blessed_users
     defaults:
       agg_time_dimension: first_ordered_at
     description: |
-      Customer grain mart.
-    model: ref('customers')
+      Blessed user grain mart.
+    model: ref('blessed_users')
     entities:
-      - name: customer
-        expr: customer_id
+      - name: blessed_user
+        expr: blessed_user_id
         type: primary
     dimensions:
-      - name: customer_name
+      - name: blessed_user_name
         type: categorical
-      - name: customer_type
+      - name: blessed_user_type
         type: categorical
       - name: first_ordered_at
         type: time
@@ -55,22 +55,22 @@ semantic_models:
         type_params:
           time_granularity: day
     measures:
-      - name: customers
-        description: Count of unique customers
+      - name: blessed_users
+        description: Count of unique blessed users
         agg: count_distinct
       - name: count_lifetime_orders
-        description: Total count of orders per customer.
+        description: Total count of orders per blessed user.
         agg: sum
       - name: lifetime_spend_pretax
-        description: Customer lifetime spend before taxes.
+        description: Blessed user lifetime spend before taxes.
         agg: sum
       - name: lifetime_spend
         agg: sum
-        description: Gross customer lifetime spend inclusive of taxes.
+        description: Gross blessed user lifetime spend inclusive of taxes.
 
 metrics:
   - name: lifetime_spend_pretax
-    description: Customer's lifetime spend before tax
+    description: Blessed user's lifetime spend before tax
     label: LTV Pre-tax
     type: simple
     type_params:
@@ -92,15 +92,15 @@ metrics:
       expr: lifetime_spend_pretax / count_lifetime_orders
 
 saved_queries:
-  - name: customer_order_metrics
+  - name: blessed_user_order_metrics
     query_params:
       metrics:
         - count_lifetime_orders
         - lifetime_spend_pretax
         - average_order_value
       group_by:
-        - Entity('customer')
+        - Entity('blessed_user')
     exports:
-      - name: customer_order_metrics
+      - name: blessed_user_order_metrics
         config:
           export_as: table
