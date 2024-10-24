@@ -1,8 +1,8 @@
 with
 
-customers as (
+blessed_users as (
 
-    select * from {{ ref('stg_customers') }}
+    select * from {{ ref('stg_blessed_users') }}
 
 ),
 
@@ -12,10 +12,10 @@ orders as (
 
 ),
 
-customer_orders_summary as (
+blessed_user_orders_summary as (
 
     select
-        orders.customer_id,
+        orders.blessed_user_id,
 
         count(distinct orders.order_id) as count_lifetime_orders,
         count(distinct orders.order_id) > 1 as is_repeat_buyer,
@@ -34,24 +34,24 @@ customer_orders_summary as (
 joined as (
 
     select
-        customers.*,
+        blessed_users.*,
 
-        customer_orders_summary.count_lifetime_orders,
-        customer_orders_summary.first_ordered_at,
-        customer_orders_summary.last_ordered_at,
-        customer_orders_summary.lifetime_spend_pretax,
-        customer_orders_summary.lifetime_tax_paid,
-        customer_orders_summary.lifetime_spend,
+        blessed_user_orders_summary.count_lifetime_orders,
+        blessed_user_orders_summary.first_ordered_at,
+        blessed_user_orders_summary.last_ordered_at,
+        blessed_user_orders_summary.lifetime_spend_pretax,
+        blessed_user_orders_summary.lifetime_tax_paid,
+        blessed_user_orders_summary.lifetime_spend,
 
         case
-            when customer_orders_summary.is_repeat_buyer then 'returning'
+            when blessed_user_orders_summary.is_repeat_buyer then 'returning'
             else 'new'
-        end as customer_type
+        end as blessed_user_type
 
-    from customers
+    from blessed_users
 
-    left join customer_orders_summary
-        on customers.customer_id = customer_orders_summary.customer_id
+    left join blessed_user_orders_summary
+        on blessed_users.blessed_user_id = blessed_user_orders_summary.blessed_user_id
 
 )
 
