@@ -1,16 +1,10 @@
-with
-
-source as (
-
+with source as (
     select * from {{ source('ecom', 'raw_stores') }}
-
 ),
 
 renamed as (
-
     select
-
-        ----------  ids
+        ---------- ids
         id as location_id,
 
         ---------- text
@@ -21,9 +15,7 @@ renamed as (
 
         ---------- timestamps
         {{ dbt.date_trunc('day', 'opened_at') }} as opened_date
-
     from source
-
 )
 
 select * from renamed
