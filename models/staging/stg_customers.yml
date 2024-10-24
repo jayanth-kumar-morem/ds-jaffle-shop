@@ -1,9 +1,9 @@
 models:
-  - name: stg_customers
-    description: Customer data with basic cleaning and transformation applied, one row per customer.
+  - name: stg_blessed_users
+    description: Blessed user data with basic cleaning and transformation applied, one row per blessed user.
     columns:
-      - name: customer_id
-        description: The unique key for each customer.
+      - name: blessed_user_id
+        description: The unique key for each blessed user.
         data_tests:
           - not_null
           - unique
