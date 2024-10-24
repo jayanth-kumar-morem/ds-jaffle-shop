@@ -16,7 +16,7 @@ renamed as (
         ---------- text
         name as customer_name
 
-    from source
+    from source 
 
 )
 
