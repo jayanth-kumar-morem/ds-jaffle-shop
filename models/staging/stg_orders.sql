@@ -13,7 +13,7 @@ renamed as (
         ----------  ids
         id as order_id,
         store_id as location_id,
-        customer as customer_id,
+        customer as blessed_user_id,
 
         ---------- numerics
         subtotal as subtotal_cents,
