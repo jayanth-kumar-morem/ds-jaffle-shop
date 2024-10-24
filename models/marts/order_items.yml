@@ -44,8 +44,7 @@ semantic_models:
   - name: order_item
     defaults:
       agg_time_dimension: ordered_at
-    description: |
-      Items contatined in each order. The grain of the table is one row per order item.
+    description: "Items contained in each order. The grain of the table is one row per order item."
     model: ref('order_items')
     entities:
       - name: order_item
@@ -69,74 +68,73 @@ semantic_models:
         type: categorical
     measures:
       - name: revenue
-        description: The revenue generated for each order item. Revenue is calculated as a sum of revenue associated with each product in an order.
+        description: "The revenue generated for each order item. Revenue is calculated as a sum of revenue associated with each product in an order."
         agg: sum
         expr: product_price
       - name: food_revenue
-        description: The revenue generated for each order item. Revenue is calculated as a sum of revenue associated with each product in an order.
+        description: "The revenue generated for food items in each order."
         agg: sum
         expr: case when is_food_item is true then product_price else 0 end
       - name: drink_revenue
-        description: The revenue generated for each order item. Revenue is calculated as a sum of revenue associated with each product in an order.
+        description: "The revenue generated for drink items in each order."
         agg: sum
         expr: case when is_drink_item is true then product_price else 0 end
       - name: median_revenue
-        description: The median revenue generated for each order item.
+        description: "The median revenue generated for each order item."
         agg: median
         expr: product_price
+      - name: order_cost
+        description: "The cost associated with each order item."
+        agg: sum
+        expr: supply_cost
 
 metrics:
-  # Simple metrics
   - name: revenue
-    description: Sum of the product revenue for each order item. Excludes tax.
+    description: "Sum of the product revenue for each order item. Excludes tax."
     type: simple
     label: Revenue
     type_params:
       measure: revenue
   - name: order_cost
-    description: Sum of cost for each order item.
+    description: "Sum of cost for each order item."
     label: Order Cost
     type: simple
     type_params:
       measure: order_cost
   - name: median_revenue
-    description: The median revenue for each order item. Excludes tax.
+    description: "The median revenue for each order item. Excludes tax."
     type: simple
     label: Median Revenue
     type_params:
       measure: median_revenue
   - name: food_revenue
-    description: The revenue from food in each order
+    description: "The revenue from food in each order"
     label: Food Revenue
     type: simple
     type_params:
       measure: food_revenue
   - name: drink_revenue
-    description: The revenue from drinks in each order
+    description: "The revenue from drinks in each order"
     label: Drink Revenue
     type: simple
     type_params:
       measure: drink_revenue
-
-  # Ratio Metrics
   - name: food_revenue_pct
-    description: The % of order revenue from food.
+    description: "The % of order revenue from food."
     label: Food Revenue %
     type: ratio
     type_params:
       numerator: food_revenue
       denominator: revenue
   - name: drink_revenue_pct
-    description: The % of order revenue from drinks.
+    description: "The % of order revenue from drinks."
     label: Drink Revenue %
     type: ratio
     type_params:
       numerator: drink_revenue
       denominator: revenue
-
-  # Derived Metrics
   - name: revenue_growth_mom
-    description: "Percentage growth of revenue compared to 1 month ago. Excluded tax"
+    description: "Percentage growth of revenue compared to 1 month ago. Excludes tax"
     type: derived
     label: Revenue Growth % M/M
     type_params:
@@ -148,7 +146,7 @@ metrics:
           offset_window: 1 month
           alias: revenue_prev_month
   - name: order_gross_profit
-    description: Gross profit from each order.
+    description: "Gross profit from each order."
     type: derived
     label: Order Gross Profit
     type_params:
@@ -157,10 +155,8 @@ metrics:
         - name: revenue
         - name: order_cost
           alias: cost
-
-  #Cumulative Metrics
   - name: cumulative_revenue
-    description: The cumulative revenue for all orders.
+    description: "The cumulative revenue for all orders."
     label: Cumulative Revenue (All Time)
     type: cumulative
     type_params:
