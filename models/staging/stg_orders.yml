@@ -10,3 +10,10 @@ models:
         data_tests:
           - not_null
           - unique
+      - name: blessed_user_id
+        description: The foreign key relating to the blessed user who placed the order.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_blessed_users')
+              field: blessed_user_id
