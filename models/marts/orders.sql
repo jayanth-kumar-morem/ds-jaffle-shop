@@ -60,18 +60,18 @@ compute_booleans as (
 
 ),
 
-customer_order_count as (
+blessed_user_order_count as (
 
     select
         *,
 
         row_number() over (
-            partition by customer_id
+            partition by blessed_user_id
             order by ordered_at asc
-        ) as customer_order_number
+        ) as blessed_user_order_number
 
     from compute_booleans
 
 )
 
-select * from customer_order_count
+select * from blessed_user_order_count
