@@ -1,6 +1,6 @@
 models:
   - name: orders
-    description: Order overview data mart, offering key details for each order inlcluding if it's a customer's first order and a food vs. drink item breakdown. One row per order.
+    description: Order overview data mart, offering key details for each order including if it's a blessed user's first order and a food vs. drink item breakdown. One row per order.
     data_tests:
       - dbt_utils.expression_is_true:
           expression: "order_items_subtotal = subtotal"
@@ -12,12 +12,12 @@ models:
         data_tests:
           - not_null
           - unique
-      - name: customer_id
-        description: The foreign key relating to the customer who placed the order.
+      - name: blessed_user_id
+        description: The foreign key relating to the blessed user who placed the order.
         data_tests:
           - relationships:
-              to: ref('stg_customers')
-              field: customer_id
+              to: ref('stg_blessed_users')
+              field: blessed_user_id
       - name: order_total
         description: The total amount of the order in USD including tax.
       - name: ordered_at
@@ -88,9 +88,9 @@ semantic_models:
       - name: location
         type: foreign
         expr: location_id
-      - name: customer
+      - name: blessed_user
         type: foreign
-        expr: customer_id
+        expr: blessed_user_id
     dimensions:
       - name: ordered_at
         expr: ordered_at
@@ -104,7 +104,7 @@ semantic_models:
         type: categorical
       - name: is_drink_order
         type: categorical
-      - name: customer_order_number
+      - name: blessed_user_order_number
         type: categorical
     measures:
       - name: order_total
@@ -122,19 +122,19 @@ semantic_models:
 
 metrics:
   - name: order_total
-    description: Sum of total order amonunt. Includes tax + revenue.
+    description: Sum of total order amount. Includes tax + revenue.
     type: simple
     label: Order Total
     type_params:
       measure: order_total
-  - name: new_customer_orders
-    description: New customer's first order count
-    label: New Customers
+  - name: new_blessed_user_orders
+    description: New blessed user's first order count
+    label: New Blessed Users
     type: simple
     type_params:
       measure: order_count
     filter: |
-      {{ Dimension('order_id__customer_order_number') }} = 1
+      {{ Dimension('order_id__blessed_user_order_number') }} = 1
   - name: large_orders
     description: "Count of orders with order total over 20."
     type: simple
@@ -171,7 +171,7 @@ saved_queries:
     query_params:
       metrics:
         - orders
-        - new_customer_orders
+        - new_blessed_user_orders
         - order_total
         - food_orders
         - drink_orders
