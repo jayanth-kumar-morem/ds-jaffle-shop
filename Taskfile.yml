@@ -13,9 +13,9 @@ tasks:
 
   install:
     cmds:
-      - source .venv/bin/activate && python3 -m pip install --upgrade pip --progress-bar off > /dev/null
-      - source .venv/bin/activate && python3 -m pip install -r requirements.txt --progress-bar off > /dev/null
-      - source .venv/bin/activate && python3 -m pip install dbt-core dbt-{{.DB}} > /dev/null
+      - source .venv/bin/activate && pip install --upgrade pip -q
+      - source .venv/bin/activate && pip install -r requirements.txt -q
+      - source .venv/bin/activate && pip install dbt-core dbt-{{.DB}} -q
 
   gen:
     cmds:
@@ -28,12 +28,9 @@ tasks:
   clean:
     cmds:
       - rm -rf jaffle-data
-      - source .venv/bin/activate && python3 -m pip uninstall dbt-core dbt-{{.DB}} -y
+      - source .venv/bin/activate && pip uninstall dbt-core dbt-{{.DB}} -y -q
 
   load:
+    deps: [venv, install, gen, seed, clean]
     cmds:
-      - task: venv
-      - task: install
-      - task: gen
-      - task: seed
-      - task: clean
+      - echo "Data loading process completed"
