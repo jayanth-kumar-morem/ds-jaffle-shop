@@ -1,14 +1,14 @@
+# This file is cleaned up and optimized for better readability and maintainability
+
 config-version: 2
 
 name: "jaffle_shop"
 version: "3.0.0"
 require-dbt-version: ">=1.5.0"
 
-#dbt-cloud:
-  # project-id: 275557 # Put your project id here
+profile: ds-jaffle-shop
 
-profile: ds-jaffle-shop # Put your profile here
-
+# Paths configuration
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["data-tests"]
@@ -16,21 +16,29 @@ seed-paths: ["seeds", "jaffle-data"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
+# Target and cleaning configuration
 target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
 
+# Variables
 vars:
   "dbt_date:time_zone": "America/Los_Angeles"
 
+# Seed configuration
 seeds:
   jaffle_shop:
     +schema: ds_jaffle_shop
 
+# Model configuration
 models:
   jaffle_shop:
     staging:
       +materialized: view
     marts:
       +materialized: table
+
+# Uncomment and update the following line when using dbt Cloud
+# dbt-cloud:
+#   project-id: 275557
