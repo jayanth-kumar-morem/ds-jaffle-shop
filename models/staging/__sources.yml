@@ -9,7 +9,7 @@ sources:
         count: 24
         period: hour
     tables:
-      - name: raw_customers
+      - name: raw_blessed_users
         description: One record per person who has purchased one or more items
       - name: raw_orders
         description: One record per order (consisting of one or more order items)
