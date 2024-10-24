@@ -26,7 +26,7 @@ renamed as (
         ---------- timestamps
         {{ dbt.date_trunc('day','ordered_at') }} as ordered_at
 
-    from source
+    from source 
 
 )
 
