@@ -11,7 +11,7 @@ renamed as (
     select
 
         ----------  ids
-        sku as product_id,
+        sku as p_id,
 
         ---------- text
         name as product_name,
