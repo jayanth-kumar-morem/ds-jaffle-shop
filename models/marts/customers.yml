@@ -6,7 +6,7 @@ models:
           expression: "lifetime_spend_pretax + lifetime_tax_paid = lifetime_spend"
     columns:
       - name: customer_id
-        description: The unique key of the orders mart.
+        description: The unique key of the customers mart.
         data_tests:
           - not_null
           - unique
@@ -34,8 +34,7 @@ semantic_models:
   - name: customers
     defaults:
       agg_time_dimension: first_ordered_at
-    description: |
-      Customer grain mart.
+    description: Customer grain mart.
     model: ref('customers')
     entities:
       - name: customer
