@@ -29,6 +29,10 @@ models:
         data_tests:
           - accepted_values:
               values: ["new", "returning"]
+      - name: average_order_value
+        description: The average value of all orders placed by the customer.
+      - name: total_orders
+        description: The total number of orders placed by the customer.
 
 semantic_models:
   - name: customers
@@ -67,6 +71,12 @@ semantic_models:
       - name: lifetime_spend
         agg: sum
         description: Gross customer lifetime spend inclusive of taxes.
+      - name: average_order_value
+        description: Average value of all orders placed by the customer.
+        agg: avg
+      - name: total_orders
+        description: Total number of orders placed by the customer.
+        agg: sum
 
 metrics:
   - name: lifetime_spend_pretax
@@ -84,12 +94,15 @@ metrics:
   - name: average_order_value
     description: LTV pre-tax / number of orders
     label: Average Order Value
-    type: derived
+    type: simple
     type_params:
-      metrics:
-        - count_lifetime_orders
-        - lifetime_spend_pretax
-      expr: lifetime_spend_pretax / count_lifetime_orders
+      measure: average_order_value
+  - name: total_orders
+    description: Total number of orders placed by customers
+    label: Total Orders
+    type: simple
+    type_params:
+      measure: total_orders
 
 saved_queries:
   - name: customer_order_metrics
@@ -98,6 +111,7 @@ saved_queries:
         - count_lifetime_orders
         - lifetime_spend_pretax
         - average_order_value
+        - total_orders
       group_by:
         - Entity('customer')
     exports:
