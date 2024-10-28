@@ -1,0 +1,25 @@
+{
+  "branch": {
+    "base_branch": "main",
+    "new_branch": "feature/new-pr"
+  },
+  "files": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "content_updates_description": "Add a new job for creating a pull request"
+    }
+  ],
+  "commit": {
+    "message": "Add PR creation job to CI workflow",
+    "author": {
+      "name": "DBT Developer",
+      "email": "dbt_developer@example.com"
+    }
+  },
+  "pull_request": {
+    "title": "Add PR creation job to CI workflow",
+    "body": "This pull request adds a new job to the CI workflow for creating pull requests automatically.",
+    "head": "feature/new-pr",
+    "base": "main"
+  }
+}
