@@ -1,36 +1,36 @@
 with
 
-order_items as (
+orderItems as (
 
-    select * from {{ ref('stg_order_items') }}
+    select * from {{ ref('stgOrderItems') }}
 
 ),
 
 
 orders as (
 
-    select * from {{ ref('stg_orders') }}
+    select * from {{ ref('stgOrders') }}
 
 ),
 
 products as (
 
-    select * from {{ ref('stg_products') }}
+    select * from {{ ref('stgProducts') }}
 
 ),
 
 supplies as (
 
-    select * from {{ ref('stg_supplies') }}
+    select * from {{ ref('stgSupplies') }}
 
 ),
 
-order_supplies_summary as (
+orderSuppliesSummary as (
 
     select
-        product_id,
+        productId,
 
-        sum(supply_cost) as supply_cost
+        sum(supplyCost) as supplyCost
 
     from supplies
 
@@ -41,25 +41,25 @@ order_supplies_summary as (
 joined as (
 
     select
-        order_items.*,
+        orderItems.*,
 
-        orders.ordered_at,
+        orders.orderedAt,
 
-        products.product_name,
-        products.product_price,
-        products.is_food_item,
-        products.is_drink_item,
+        products.productName,
+        products.productPrice,
+        products.isFoodItem,
+        products.isDrinkItem,
 
-        order_supplies_summary.supply_cost
+        orderSuppliesSummary.supplyCost
 
-    from order_items
+    from orderItems
 
-    left join orders on order_items.order_id = orders.order_id
+    left join orders on orderItems.orderId = orders.orderId
 
-    left join products on order_items.product_id = products.product_id
+    left join products on orderItems.productId = products.productId
 
-    left join order_supplies_summary
-        on order_items.product_id = order_supplies_summary.product_id
+    left join orderSuppliesSummary
+        on orderItems.productId = orderSuppliesSummary.productId
 
 )
 
