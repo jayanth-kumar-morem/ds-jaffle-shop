@@ -2,7 +2,7 @@ with
 
 source as (
 
-    select * from {{ source('ecom', 'raw_products') }}
+    select * from {{ source('ecom', 'rawProducts') }}
 
 ),
 
@@ -11,21 +11,21 @@ renamed as (
     select
 
         ----------  ids
-        sku as product_id,
+        sku as productId,
 
         ---------- text
-        name as product_name,
-        type as product_type,
-        description as product_description,
+        name as productName,
+        type as productType,
+        description as productDescription,
 
 
         ---------- numerics
-        {{ cents_to_dollars('price') }} as product_price,
+        {{ centsToToDollars('price') }} as productPrice,
 
         ---------- booleans
-        coalesce(type = 'jaffle', false) as is_food_item,
+        coalesce(type = 'jaffle', false) as isFoodItem,
 
-        coalesce(type = 'beverage', false) as is_drink_item
+        coalesce(type = 'beverage', false) as isDrinkItem
 
     from source
 
