@@ -2,7 +2,7 @@ with
 
 source as (
 
-    select * from {{ source('ecom', 'raw_items') }}
+    select * from {{ source('ecom', 'rawItems') }}
 
 ),
 
@@ -11,9 +11,9 @@ renamed as (
     select
 
         ----------  ids
-        id as order_item_id,
-        order_id,
-        sku as product_id
+        id as orderItemId,
+        orderId,
+        sku as productId
 
     from source
 
