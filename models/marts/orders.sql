@@ -2,76 +2,76 @@ with
 
 orders as (
 
-    select * from {{ ref('stg_orders') }}
+    select * from {{ ref('stgOrders') }}
 
 ),
 
-order_items as (
+orderItems as (
 
-    select * from {{ ref('order_items') }}
+    select * from {{ ref('orderItems') }}
 
 ),
 
-order_items_summary as (
+orderItemsSummary as (
 
     select
-        order_id,
+        orderId,
 
-        sum(supply_cost) as order_cost,
-        sum(product_price) as order_items_subtotal,
-        count(order_item_id) as count_order_items,
+        sum(supplyCost) as orderCost,
+        sum(productPrice) as orderItemsSubtotal,
+        count(orderItemId) as countOrderItems,
         sum(
             case
-                when is_food_item then 1
+                when isFoodItem then 1
                 else 0
             end
-        ) as count_food_items,
+        ) as countFoodItems,
         sum(
             case
-                when is_drink_item then 1
+                when isDrinkItem then 1
                 else 0
             end
-        ) as count_drink_items
+        ) as countDrinkItems
 
-    from order_items
+    from orderItems
 
     group by 1
 
 ),
 
-compute_booleans as (
+computeBooleans as (
 
     select
         orders.*,
 
-        order_items_summary.order_cost,
-        order_items_summary.order_items_subtotal,
-        order_items_summary.count_food_items,
-        order_items_summary.count_drink_items,
-        order_items_summary.count_order_items,
-        order_items_summary.count_food_items > 0 as is_food_order,
-        order_items_summary.count_drink_items > 0 as is_drink_order
+        orderItemsSummary.orderCost,
+        orderItemsSummary.orderItemsSubtotal,
+        orderItemsSummary.countFoodItems,
+        orderItemsSummary.countDrinkItems,
+        orderItemsSummary.countOrderItems,
+        orderItemsSummary.countFoodItems > 0 as isFoodOrder,
+        orderItemsSummary.countDrinkItems > 0 as isDrinkOrder
 
     from orders
 
     left join
-        order_items_summary
-        on orders.order_id = order_items_summary.order_id
+        orderItemsSummary
+        on orders.orderId = orderItemsSummary.orderId
 
 ),
 
-customer_order_count as (
+customerOrderCount as (
 
     select
         *,
 
         row_number() over (
-            partition by customer_id
-            order by ordered_at asc
-        ) as customer_order_number
+            partition by customerId
+            order by orderedAt asc
+        ) as customerOrderNumber
 
-    from compute_booleans
+    from computeBooleans
 
 )
 
-select * from customer_order_count
+select * from customerOrderCount
