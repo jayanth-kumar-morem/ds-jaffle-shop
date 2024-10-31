@@ -1,4 +1,4 @@
--- metricflow_time_spine.sql
+-- metricflowTimeSpine.sql
 with
 
 days as (
@@ -8,12 +8,12 @@ days as (
 
 ),
 
-cast_to_date as (
+castToDate as (
 
-    select cast(date_day as date) as date_day
+    select cast(date_day as date) as dateDay
 
     from days
 
 )
 
-select * from cast_to_date
+select * from castToDate
