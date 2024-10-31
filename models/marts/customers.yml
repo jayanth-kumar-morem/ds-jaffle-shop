@@ -3,28 +3,28 @@ models:
     description: Customer overview data mart, offering key details for each unique customer. One row per customer.
     data_tests:
       - dbt_utils.expression_is_true:
-          expression: "lifetime_spend_pretax + lifetime_tax_paid = lifetime_spend"
+          expression: "lifetimeSpendPretax + lifetimeTaxPaid = lifetimeSpend"
     columns:
-      - name: customer_id
+      - name: customerId
         description: The unique key of the orders mart.
         data_tests:
           - not_null
           - unique
-      - name: customer_name
+      - name: customerName
         description: Customers' full name.
-      - name: count_lifetime_orders
+      - name: countLifetimeOrders
         description: Total number of orders a customer has ever placed.
-      - name: first_ordered_at
+      - name: firstOrderedAt
         description: The timestamp when a customer placed their first order.
-      - name: last_ordered_at
+      - name: lastOrderedAt
         description: The timestamp of a customer's most recent order.
-      - name: lifetime_spend_pretax
+      - name: lifetimeSpendPretax
         description: The sum of all the pre-tax subtotals of every order a customer has placed.
-      - name: lifetime_tax_paid
+      - name: lifetimeTaxPaid
         description: The sum of all the tax portion of every order a customer has placed.
-      - name: lifetime_spend
+      - name: lifetimeSpend
         description: The sum of all the order totals (including tax) that a customer has ever placed.
-      - name: customer_type
+      - name: customerType
         description: Options are 'new' or 'returning', indicating if a customer has ordered more than once or has only placed their first order to date.
         data_tests:
           - accepted_values:
@@ -33,24 +33,24 @@ models:
 semantic_models:
   - name: customers
     defaults:
-      agg_time_dimension: first_ordered_at
+      agg_time_dimension: firstOrderedAt
     description: |
       Customer grain mart.
     model: ref('customers')
     entities:
       - name: customer
-        expr: customer_id
+        expr: customerId
         type: primary
     dimensions:
-      - name: customer_name
+      - name: customerName
         type: categorical
-      - name: customer_type
+      - name: customerType
         type: categorical
-      - name: first_ordered_at
+      - name: firstOrderedAt
         type: time
         type_params:
           time_granularity: day
-      - name: last_ordered_at
+      - name: lastOrderedAt
         type: time
         type_params:
           time_granularity: day
@@ -58,49 +58,49 @@ semantic_models:
       - name: customers
         description: Count of unique customers
         agg: count_distinct
-      - name: count_lifetime_orders
+      - name: countLifetimeOrders
         description: Total count of orders per customer.
         agg: sum
-      - name: lifetime_spend_pretax
+      - name: lifetimeSpendPretax
         description: Customer lifetime spend before taxes.
         agg: sum
-      - name: lifetime_spend
+      - name: lifetimeSpend
         agg: sum
         description: Gross customer lifetime spend inclusive of taxes.
 
 metrics:
-  - name: lifetime_spend_pretax
+  - name: lifetimeSpendPretax
     description: Customer's lifetime spend before tax
     label: LTV Pre-tax
     type: simple
     type_params:
-      measure: lifetime_spend_pretax
-  - name: count_lifetime_orders
+      measure: lifetimeSpendPretax
+  - name: countLifetimeOrders
     description: Count of lifetime orders
     label: Count Lifetime Orders
     type: simple
     type_params:
-      measure: count_lifetime_orders
-  - name: average_order_value
+      measure: countLifetimeOrders
+  - name: averageOrderValue
     description: LTV pre-tax / number of orders
     label: Average Order Value
     type: derived
     type_params:
       metrics:
-        - count_lifetime_orders
-        - lifetime_spend_pretax
-      expr: lifetime_spend_pretax / count_lifetime_orders
+        - countLifetimeOrders
+        - lifetimeSpendPretax
+      expr: lifetimeSpendPretax / countLifetimeOrders
 
 saved_queries:
-  - name: customer_order_metrics
+  - name: customerOrderMetrics
     query_params:
       metrics:
-        - count_lifetime_orders
-        - lifetime_spend_pretax
-        - average_order_value
+        - countLifetimeOrders
+        - lifetimeSpendPretax
+        - averageOrderValue
       group_by:
         - Entity('customer')
     exports:
-      - name: customer_order_metrics
+      - name: customerOrderMetrics
         config:
           export_as: table
