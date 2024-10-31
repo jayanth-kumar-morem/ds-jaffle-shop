@@ -2,7 +2,7 @@ with
 
 customers as (
 
-    select * from {{ ref('stg_customers') }}
+    select * from {{ ref('stgCustomers') }}
 
 ),
 
@@ -12,18 +12,18 @@ orders as (
 
 ),
 
-customer_orders_summary as (
+customerOrdersSummary as (
 
     select
-        orders.customer_id,
+        orders.customerId,
 
-        count(distinct orders.order_id) as count_lifetime_orders,
-        count(distinct orders.order_id) > 1 as is_repeat_buyer,
-        min(orders.ordered_at) as first_ordered_at,
-        max(orders.ordered_at) as last_ordered_at,
-        sum(orders.subtotal) as lifetime_spend_pretax,
-        sum(orders.tax_paid) as lifetime_tax_paid,
-        sum(orders.order_total) as lifetime_spend
+        count(distinct orders.orderId) as countLifetimeOrders,
+        count(distinct orders.orderId) > 1 as isRepeatBuyer,
+        min(orders.orderedAt) as firstOrderedAt,
+        max(orders.orderedAt) as lastOrderedAt,
+        sum(orders.subtotal) as lifetimeSpendPretax,
+        sum(orders.taxPaid) as lifetimeTaxPaid,
+        sum(orders.orderTotal) as lifetimeSpend
 
     from orders
 
@@ -36,22 +36,22 @@ joined as (
     select
         customers.*,
 
-        customer_orders_summary.count_lifetime_orders,
-        customer_orders_summary.first_ordered_at,
-        customer_orders_summary.last_ordered_at,
-        customer_orders_summary.lifetime_spend_pretax,
-        customer_orders_summary.lifetime_tax_paid,
-        customer_orders_summary.lifetime_spend,
+        customerOrdersSummary.countLifetimeOrders,
+        customerOrdersSummary.firstOrderedAt,
+        customerOrdersSummary.lastOrderedAt,
+        customerOrdersSummary.lifetimeSpendPretax,
+        customerOrdersSummary.lifetimeTaxPaid,
+        customerOrdersSummary.lifetimeSpend,
 
         case
-            when customer_orders_summary.is_repeat_buyer then 'returning'
+            when customerOrdersSummary.isRepeatBuyer then 'returning'
             else 'new'
-        end as customer_type
+        end as customerType
 
     from customers
 
-    left join customer_orders_summary
-        on customers.customer_id = customer_orders_summary.customer_id
+    left join customerOrdersSummary
+        on customers.customerId = customerOrdersSummary.customerId
 
 )
 
