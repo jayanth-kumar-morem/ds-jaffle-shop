@@ -1,89 +1,89 @@
 models:
-  - name: order_items
+  - name: orderItems
     columns:
-      - name: order_item_id
+      - name: orderItemId
         data_tests:
           - not_null
           - unique
-      - name: order_id
+      - name: orderId
         data_tests:
           - relationships:
               to: ref('orders')
-              field: order_id
+              field: orderId
 
 unit_tests:
-  - name: test_supply_costs_sum_correctly
+  - name: testSupplyCostsSumCorrectly
     description: "Test that the counts of drinks and food orders convert to booleans properly."
-    model: order_items
+    model: orderItems
     given:
-      - input: ref('stg_supplies')
+      - input: ref('stgSupplies')
         rows:
-          - { product_id: 1, supply_cost: 4.50 }
-          - { product_id: 2, supply_cost: 3.50 }
-          - { product_id: 2, supply_cost: 5.00 }
-      - input: ref('stg_products')
+          - { productId: 1, supplyCost: 4.50 }
+          - { productId: 2, supplyCost: 3.50 }
+          - { productId: 2, supplyCost: 5.00 }
+      - input: ref('stgProducts')
         rows:
-          - { product_id: 1 }
-          - { product_id: 2 }
-      - input: ref('stg_order_items')
+          - { productId: 1 }
+          - { productId: 2 }
+      - input: ref('stgOrderItems')
         rows:
-          - { order_id: 1, product_id: 1 }
-          - { order_id: 2, product_id: 2 }
-          - { order_id: 2, product_id: 2 }
-      - input: ref('stg_orders')
+          - { orderId: 1, productId: 1 }
+          - { orderId: 2, productId: 2 }
+          - { orderId: 2, productId: 2 }
+      - input: ref('stgOrders')
         rows:
-          - { order_id: 1 }
-          - { order_id: 2 }
+          - { orderId: 1 }
+          - { orderId: 2 }
     expect:
       rows:
-        - { order_id: 1, product_id: 1, supply_cost: 4.50 }
-        - { order_id: 2, product_id: 2, supply_cost: 8.50 }
-        - { order_id: 2, product_id: 2, supply_cost: 8.50 }
+        - { orderId: 1, productId: 1, supplyCost: 4.50 }
+        - { orderId: 2, productId: 2, supplyCost: 8.50 }
+        - { orderId: 2, productId: 2, supplyCost: 8.50 }
 
 semantic_models:
-  - name: order_item
+  - name: orderItem
     defaults:
-      agg_time_dimension: ordered_at
+      agg_time_dimension: orderedAt
     description: |
-      Items contatined in each order. The grain of the table is one row per order item.
-    model: ref('order_items')
+      Items contained in each order. The grain of the table is one row per order item.
+    model: ref('orderItems')
     entities:
-      - name: order_item
+      - name: orderItem
         type: primary
-        expr: order_item_id
-      - name: order_id
+        expr: orderItemId
+      - name: orderId
         type: foreign
-        expr: order_id
+        expr: orderId
       - name: product
         type: foreign
-        expr: product_id
+        expr: productId
     dimensions:
-      - name: ordered_at
-        expr: ordered_at
+      - name: orderedAt
+        expr: orderedAt
         type: time
         type_params:
           time_granularity: day
-      - name: is_food_item
+      - name: isFoodItem
         type: categorical
-      - name: is_drink_item
+      - name: isDrinkItem
         type: categorical
     measures:
       - name: revenue
         description: The revenue generated for each order item. Revenue is calculated as a sum of revenue associated with each product in an order.
         agg: sum
-        expr: product_price
-      - name: food_revenue
+        expr: productPrice
+      - name: foodRevenue
         description: The revenue generated for each order item. Revenue is calculated as a sum of revenue associated with each product in an order.
         agg: sum
-        expr: case when is_food_item is true then product_price else 0 end
-      - name: drink_revenue
+        expr: case when isFoodItem is true then productPrice else 0 end
+      - name: drinkRevenue
         description: The revenue generated for each order item. Revenue is calculated as a sum of revenue associated with each product in an order.
         agg: sum
-        expr: case when is_drink_item is true then product_price else 0 end
-      - name: median_revenue
+        expr: case when isDrinkItem is true then productPrice else 0 end
+      - name: medianRevenue
         description: The median revenue generated for each order item.
         agg: median
-        expr: product_price
+        expr: productPrice
 
 metrics:
   # Simple metrics
@@ -93,61 +93,61 @@ metrics:
     label: Revenue
     type_params:
       measure: revenue
-  - name: order_cost
+  - name: orderCost
     description: Sum of cost for each order item.
     label: Order Cost
     type: simple
     type_params:
-      measure: order_cost
-  - name: median_revenue
+      measure: orderCost
+  - name: medianRevenue
     description: The median revenue for each order item. Excludes tax.
     type: simple
     label: Median Revenue
     type_params:
-      measure: median_revenue
-  - name: food_revenue
+      measure: medianRevenue
+  - name: foodRevenue
     description: The revenue from food in each order
     label: Food Revenue
     type: simple
     type_params:
-      measure: food_revenue
-  - name: drink_revenue
+      measure: foodRevenue
+  - name: drinkRevenue
     description: The revenue from drinks in each order
     label: Drink Revenue
     type: simple
     type_params:
-      measure: drink_revenue
+      measure: drinkRevenue
 
   # Ratio Metrics
-  - name: food_revenue_pct
+  - name: foodRevenuePct
     description: The % of order revenue from food.
     label: Food Revenue %
     type: ratio
     type_params:
-      numerator: food_revenue
+      numerator: foodRevenue
       denominator: revenue
-  - name: drink_revenue_pct
+  - name: drinkRevenuePct
     description: The % of order revenue from drinks.
     label: Drink Revenue %
     type: ratio
     type_params:
-      numerator: drink_revenue
+      numerator: drinkRevenue
       denominator: revenue
 
   # Derived Metrics
-  - name: revenue_growth_mom
+  - name: revenueGrowthMom
     description: "Percentage growth of revenue compared to 1 month ago. Excluded tax"
     type: derived
     label: Revenue Growth % M/M
     type_params:
-      expr: (current_revenue - revenue_prev_month)*100/revenue_prev_month
+      expr: (currentRevenue - revenuePrevMonth)*100/revenuePrevMonth
       metrics:
         - name: revenue
-          alias: current_revenue
+          alias: currentRevenue
         - name: revenue
           offset_window: 1 month
-          alias: revenue_prev_month
-  - name: order_gross_profit
+          alias: revenuePrevMonth
+  - name: orderGrossProfit
     description: Gross profit from each order.
     type: derived
     label: Order Gross Profit
@@ -155,11 +155,11 @@ metrics:
       expr: revenue - cost
       metrics:
         - name: revenue
-        - name: order_cost
+        - name: orderCost
           alias: cost
 
   #Cumulative Metrics
-  - name: cumulative_revenue
+  - name: cumulativeRevenue
     description: The cumulative revenue for all orders.
     label: Cumulative Revenue (All Time)
     type: cumulative
@@ -167,15 +167,15 @@ metrics:
       measure: revenue
 
 saved_queries:
-  - name: revenue_metrics
+  - name: revenueMetrics
     query_params:
       metrics:
         - revenue
-        - food_revenue
-        - drink_revenue
+        - foodRevenue
+        - drinkRevenue
       group_by:
-        - TimeDimension('metric_time', 'day')
+        - TimeDimension('metricTime', 'day')
     exports:
-      - name: revenue_metrics
+      - name: revenueMetrics
         config:
           export_as: table
