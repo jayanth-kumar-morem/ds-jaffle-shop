@@ -2,7 +2,7 @@ with
 
 source as (
 
-    select * from {{ source('ecom', 'raw_supplies') }}
+    select * from {{ source('ecom', 'rawSupplies') }}
 
 ),
 
@@ -11,18 +11,18 @@ renamed as (
     select
 
         ----------  ids
-        {{ dbt_utils.generate_surrogate_key(['id', 'sku']) }} as supply_uuid,
-        id as supply_id,
-        sku as product_id,
+        {{ dbt_utils.generate_surrogate_key(['id', 'sku']) }} as supplyUuid,
+        id as supplyId,
+        sku as productId,
 
         ---------- text
-        name as supply_name,
+        name as supplyName,
 
         ---------- numerics
-        {{ cents_to_dollars('cost') }} as supply_cost,
+        {{ centsToToDollars('cost') }} as supplyCost,
 
         ---------- booleans
-        perishable as is_perishable_supply
+        perishable as isPerishableSupply
 
     from source
 
