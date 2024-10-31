@@ -1,21 +1,21 @@
 {# A basic example for a project-wide macro to cast a column uniformly #}
 
-{% macro cents_to_dollars(column_name) -%}
-    {{ return(adapter.dispatch('cents_to_dollars')(column_name)) }}
+{% macro centsToToDollars(columnName) -%}
+    {{ return(adapter.dispatch('centsToToDollars')(columnName)) }}
 {%- endmacro %}
 
-{% macro default__cents_to_dollars(column_name) -%}
-    ({{ column_name }} / 100)::numeric(16, 2)
+{% macro default__centsToToDollars(columnName) -%}
+    ({{ columnName }} / 100)::numeric(16, 2)
 {%- endmacro %}
 
-{% macro postgres__cents_to_dollars(column_name) -%}
-    ({{ column_name }}::numeric(16, 2) / 100)
+{% macro postgres__centsToToDollars(columnName) -%}
+    ({{ columnName }}::numeric(16, 2) / 100)
 {%- endmacro %}
 
-{% macro bigquery__cents_to_dollars(column_name) %}
-    round(cast(({{ column_name }} / 100) as numeric), 2)
+{% macro bigquery__centsToToDollars(columnName) %}
+    round(cast(({{ columnName }} / 100) as numeric), 2)
 {% endmacro %}
 
-{% macro fabric__cents_to_dollars(column_name) %}
-    cast({{ column_name }} / 100 as numeric(16,2))
+{% macro fabric__centsToToDollars(columnName) %}
+    cast({{ columnName }} / 100 as numeric(16,2))
 {% endmacro %}
