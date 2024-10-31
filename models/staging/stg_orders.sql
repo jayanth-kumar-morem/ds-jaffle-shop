@@ -2,7 +2,7 @@ with
 
 source as (
 
-    select * from {{ source('ecom', 'raw_orders') }}
+    select * from {{ source('ecom', 'rawOrders') }}
 
 ),
 
@@ -11,20 +11,20 @@ renamed as (
     select
 
         ----------  ids
-        id as order_id,
-        store_id as location_id,
-        customer as customer_id,
+        id as orderId,
+        storeId as locationId,
+        customer as customerId,
 
         ---------- numerics
-        subtotal as subtotal_cents,
-        tax_paid as tax_paid_cents,
-        order_total as order_total_cents,
-        {{ cents_to_dollars('subtotal') }} as subtotal,
-        {{ cents_to_dollars('tax_paid') }} as tax_paid,
-        {{ cents_to_dollars('order_total') }} as order_total,
+        subtotal as subtotalCents,
+        taxPaid as taxPaidCents,
+        orderTotal as orderTotalCents,
+        {{ centsToToDollars('subtotal') }} as subtotal,
+        {{ centsToToDollars('taxPaid') }} as taxPaid,
+        {{ centsToToDollars('orderTotal') }} as orderTotal,
 
         ---------- timestamps
-        {{ dbt.date_trunc('day','ordered_at') }} as ordered_at
+        {{ dbt.date_trunc('day','orderedAt') }} as orderedAt
 
     from source
 
