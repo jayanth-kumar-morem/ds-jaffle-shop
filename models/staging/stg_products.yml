@@ -1,8 +1,8 @@
 models:
-  - name: stg_products
+  - name: stgProducts
     description: Product (food and drink items that can be ordered) data with basic cleaning and transformation applied, one row per product.
     columns:
-      - name: product_id
+      - name: productId
         description: The unique key for each product.
         data_tests:
           - not_null
