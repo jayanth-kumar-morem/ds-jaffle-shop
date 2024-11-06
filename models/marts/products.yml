@@ -1,16 +1,12 @@
 semantic_models:
-  #The name of the semantic model.
   - name: products
     description: |
       Product dimension table. The grain of the table is one row per product.
-    #The name of the dbt model and schema
     model: ref('products')
-    #Entities. These usually corespond to keys in the table.
     entities:
       - name: product
         type: primary
         expr: product_id
-    #Dimensions. Either categorical or time. These add additonal context to metrics. The typical querying pattern is Metric by Dimension.
     dimensions:
       - name: product_name
         type: categorical
@@ -24,3 +20,34 @@ semantic_models:
         type: categorical
       - name: product_price
         type: categorical
+
+  - name: england_products
+    description: |
+      Product dimension table for products sold in England. The grain of the table is one row per product sold in England.
+    model: ref('england_products')
+    entities:
+      - name: product
+        type: primary
+        expr: product_id
+    dimensions:
+      - name: product_name
+        type: categorical
+      - name: product_type
+        type: categorical
+      - name: product_description
+        type: categorical
+      - name: is_food_item
+        type: categorical
+      - name: is_drink_item
+        type: categorical
+      - name: product_price
+        type: categorical
+    measures:
+      - name: total_products
+        expr: product_id
+        agg: count_distinct
+        description: Total number of unique products sold in England
+      - name: average_product_price
+        expr: product_price
+        agg: average
+        description: Average price of products sold in England
