@@ -49,11 +49,11 @@ semantic_models:
       - name: first_ordered_at
         type: time
         type_params:
-          time_granularity: day
+          time_granularity: year
       - name: last_ordered_at
         type: time
         type_params:
-          time_granularity: day
+          time_granularity: year
     measures:
       - name: customers
         description: Count of unique customers
