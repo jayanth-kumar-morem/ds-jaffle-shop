@@ -1,15 +1,11 @@
 with
 
 source as (
-
     select * from {{ source('ecom', 'raw_supplies') }}
-
 ),
 
 renamed as (
-
     select
-
         ----------  ids
         {{ dbt_utils.generate_surrogate_key(['id', 'sku']) }} as supply_uuid,
         id as supply_id,
@@ -25,7 +21,12 @@ renamed as (
         perishable as is_perishable_supply
 
     from source
+),
 
+england_supplies as (
+    select r.*
+    from renamed r
+    join {{ ref('stg_locations_england') }} l on r.supply_id = l.location_id
 )
 
-select * from renamed
+select * from england_supplies
