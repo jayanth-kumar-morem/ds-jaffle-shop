@@ -7,3 +7,27 @@ models:
         data_tests:
           - not_null
           - unique
+      - name: country
+        description: The country where the customer is located.
+        data_tests:
+          - accepted_values:
+              values: ['England', 'Scotland', 'Wales', 'Northern Ireland']
+      - name: is_england_customer
+        description: Boolean flag indicating if the customer is located in England.
+        data_tests:
+          - accepted_values:
+              values: [true, false]
+
+  - name: stg_england_customers
+    description: Customer data for customers located in England, one row per customer.
+    columns:
+      - name: customer_id
+        description: The unique key for each England customer.
+        data_tests:
+          - not_null
+          - unique
+      - name: country
+        description: The country where the customer is located (should always be England).
+        data_tests:
+          - accepted_values:
+              values: ['England']
