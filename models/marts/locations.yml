@@ -17,8 +17,60 @@ semantic_models:
         type: time
         type_params:
           time_granularity: day
+      - name: country
+        type: categorical
     measures:
       - name: average_tax_rate
         description: Average tax rate.
         expr: tax_rate
         agg: average
+      - name: location_count
+        description: Count of locations.
+        expr: location_id
+        agg: count_distinct
+
+  - name: england_locations
+    description: |
+      England location dimension table. The grain of the table is one row per location in England.
+    model: ref('england_locations')
+    defaults:
+      agg_time_dimension: opened_at
+    entities:
+      - name: location
+        type: primary
+        expr: location_id
+    dimensions:
+      - name: location_name
+        type: categorical
+      - name: opened_at
+        expr: opened_at
+        type: time
+        type_params:
+          time_granularity: day
+    measures:
+      - name: average_tax_rate
+        description: Average tax rate for England locations.
+        expr: tax_rate
+        agg: average
+      - name: england_location_count
+        description: Count of locations in England.
+        expr: location_id
+        agg: count_distinct
+
+metrics:
+  - name: total_locations
+    description: Total number of locations
+    type: simple
+    type_params:
+      measure: location_count
+  - name: total_england_locations
+    description: Total number of locations in England
+    type: simple
+    type_params:
+      measure: england_location_count
+  - name: avg_tax_rate_england
+    description: Average tax rate for locations in England
+    type: simple
+    type_params:
+      measure: average_tax_rate
+    filter: Dimension('country') == 'England'
