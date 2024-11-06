@@ -10,3 +10,29 @@ models:
         data_tests:
           - not_null
           - unique
+      - name: location_id
+        description: The foreign key to the location where the supply is used.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_locations')
+              field: location_id
+
+  - name: stg_supplies_england
+    description: >
+      List of our supply expenses data for locations in England with basic cleaning and transformation applied.
+
+      One row per supply cost, not per supply. As supply costs fluctuate they receive a new row with a new UUID. Thus there can be multiple rows per supply_id.
+    columns:
+      - name: supply_uuid
+        description: The unique key of our supplies per cost for England locations.
+        data_tests:
+          - not_null
+          - unique
+      - name: location_id
+        description: The foreign key to the location in England where the supply is used.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_locations_england')
+              field: location_id
