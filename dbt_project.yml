@@ -34,3 +34,7 @@ models:
       +materialized: view
     marts:
       +materialized: table
+    customers:
+      england_customers:
+        +materialized: table
+        +schema: customers
