@@ -7,6 +7,25 @@ models:
         data_tests:
           - not_null
           - unique
+      - name: country
+        description: The country where the location is situated.
+        data_tests:
+          - not_null
+
+  - name: stg_locations_england
+    description: List of open locations in England with basic cleaning and transformation applied, one row per location in England.
+    columns:
+      - name: location_id
+        description: The unique key for each location in England.
+        data_tests:
+          - not_null
+          - unique
+      - name: country
+        description: The country where the location is situated (should always be England).
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['England']
 
 unit_tests:
   - name: test_does_location_opened_at_trunc_to_date
@@ -20,12 +39,14 @@ unit_tests:
               name: "Vice City",
               tax_rate: 0.2,
               opened_at: "2016-09-01T00:00:00",
+              country: "England"
             }
           - {
               id: 2,
               name: "San Andreas",
               tax_rate: 0.1,
               opened_at: "2079-10-27T23:59:59.9999",
+              country: "USA"
             }
     expect:
       rows:
@@ -34,10 +55,56 @@ unit_tests:
             location_name: "Vice City",
             tax_rate: 0.2,
             opened_date: "2016-09-01",
+            country: "England"
           }
         - {
             location_id: 2,
             location_name: "San Andreas",
             tax_rate: 0.1,
             opened_date: "2079-10-27",
+            country: "USA"
+          }
+
+  - name: test_england_locations_only
+    description: "Check that stg_locations_england only contains locations in England."
+    model: stg_locations_england
+    given:
+      - input: source('ecom', 'raw_stores')
+        rows:
+          - {
+              id: 1,
+              name: "London Store",
+              tax_rate: 0.2,
+              opened_at: "2016-09-01T00:00:00",
+              country: "England"
+            }
+          - {
+              id: 2,
+              name: "New York Store",
+              tax_rate: 0.1,
+              opened_at: "2079-10-27T23:59:59.9999",
+              country: "USA"
+            }
+          - {
+              id: 3,
+              name: "Manchester Store",
+              tax_rate: 0.2,
+              opened_at: "2018-05-15T00:00:00",
+              country: "England"
+            }
+    expect:
+      rows:
+        - {
+            location_id: 1,
+            location_name: "London Store",
+            tax_rate: 0.2,
+            opened_date: "2016-09-01",
+            country: "England"
+          }
+        - {
+            location_id: 3,
+            location_name: "Manchester Store",
+            tax_rate: 0.2,
+            opened_date: "2018-05-15",
+            country: "England"
           }
