@@ -17,8 +17,14 @@ semantic_models:
         type: time
         type_params:
           time_granularity: day
+      - name: country
+        type: categorical
     measures:
       - name: average_tax_rate
         description: Average tax rate.
         expr: tax_rate
         agg: average
+      - name: england_locations
+        description: Count of locations in England
+        expr: "case when country = 'England' then 1 else 0 end"
+        agg: sum
