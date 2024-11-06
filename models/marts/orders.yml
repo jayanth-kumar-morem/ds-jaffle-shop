@@ -1,6 +1,6 @@
 models:
   - name: orders
-    description: Order overview data mart, offering key details for each order inlcluding if it's a customer's first order and a food vs. drink item breakdown. One row per order.
+    description: Order overview data mart, offering key details for each order including if it's a customer's first order and a food vs. drink item breakdown. One row per order.
     data_tests:
       - dbt_utils.expression_is_true:
           expression: "order_items_subtotal = subtotal"
@@ -28,6 +28,8 @@ models:
         description: A boolean indicating if this order included any food items.
       - name: is_drink_order
         description: A boolean indicating if this order included any drink items.
+      - name: is_england_customer
+        description: A boolean indicating if the customer is located in England.
 
 unit_tests:
   - name: test_order_items_compute_to_bools_correctly
@@ -106,6 +108,8 @@ semantic_models:
         type: categorical
       - name: customer_order_number
         type: categorical
+      - name: is_england_customer
+        type: categorical
     measures:
       - name: order_total
         description: The total amount for each order including taxes.
@@ -122,7 +126,7 @@ semantic_models:
 
 metrics:
   - name: order_total
-    description: Sum of total order amonunt. Includes tax + revenue.
+    description: Sum of total order amount. Includes tax + revenue.
     type: simple
     label: Order Total
     type_params:
@@ -165,6 +169,14 @@ metrics:
       measure: order_count
     filter: |
       {{ Dimension('order_id__is_drink_order') }} = true
+  - name: england_customer_orders
+    description: Count of orders from customers located in England
+    label: England Customer Orders
+    type: simple
+    type_params:
+      measure: order_count
+    filter: |
+      {{ Dimension('order_id__is_england_customer') }} = true
 
 saved_queries:
   - name: order_metrics
@@ -175,6 +187,7 @@ saved_queries:
         - order_total
         - food_orders
         - drink_orders
+        - england_customer_orders
       group_by:
         - TimeDimension('metric_time', 'day')
     exports:
