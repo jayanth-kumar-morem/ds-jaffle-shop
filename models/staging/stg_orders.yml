@@ -10,3 +10,29 @@ models:
         data_tests:
           - not_null
           - unique
+      - name: customer_id
+        description: The foreign key to the customer who placed the order.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+
+  - name: stg_orders_england
+    description: Order data for customers located in England, with basic cleaning and transformation applied, one row per order from England-based customers.
+    data_tests:
+      - dbt_utils.expression_is_true:
+          expression: "order_total - tax_paid = subtotal"
+    columns:
+      - name: order_id
+        description: The unique key for each order from England-based customers.
+        data_tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: The foreign key to the England-based customer who placed the order.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers_england')
+              field: customer_id
