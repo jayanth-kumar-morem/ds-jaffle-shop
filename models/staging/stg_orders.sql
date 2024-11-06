@@ -1,15 +1,9 @@
-with
-
-source as (
-
+with source as (
     select * from {{ source('ecom', 'raw_orders') }}
-
 ),
 
 renamed as (
-
     select
-
         ----------  ids
         id as order_id,
         store_id as location_id,
@@ -24,10 +18,18 @@ renamed as (
         {{ cents_to_dollars('order_total') }} as order_total,
 
         ---------- timestamps
-        {{ dbt.date_trunc('day','ordered_at') }} as ordered_at
+        {{ dbt.date_trunc('day','ordered_at') }} as ordered_at,
+
+        ---------- location
+        country
 
     from source
+),
 
+orders_in_england as (
+    select *
+    from renamed
+    where country = 'England'
 )
 
-select * from renamed
+select * from orders_in_england
