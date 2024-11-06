@@ -29,6 +29,10 @@ models:
         data_tests:
           - accepted_values:
               values: ["new", "returning"]
+      - name: country
+        description: The country where the customer is located.
+        data_tests:
+          - not_null
 
 semantic_models:
   - name: customers
@@ -54,6 +58,8 @@ semantic_models:
         type: time
         type_params:
           time_granularity: day
+      - name: country
+        type: categorical
     measures:
       - name: customers
         description: Count of unique customers
@@ -100,7 +106,20 @@ saved_queries:
         - average_order_value
       group_by:
         - Entity('customer')
+        - dimension('country')
     exports:
       - name: customer_order_metrics
+        config:
+          export_as: table
+
+  - name: england_customers
+    query_params:
+      metrics:
+        - customers
+      group_by:
+        - Entity('customer')
+      where: dimension('country') = 'England'
+    exports:
+      - name: england_customers
         config:
           export_as: table
