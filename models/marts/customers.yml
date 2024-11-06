@@ -29,6 +29,39 @@ models:
         data_tests:
           - accepted_values:
               values: ["new", "returning"]
+      - name: is_england_customer
+        description: Indicates whether the customer is located in England.
+        data_tests:
+          - accepted_values:
+              values: [true, false]
+
+  - name: england_customers
+    description: Customer overview data mart for customers located in England. One row per customer in England.
+    columns:
+      - name: customer_id
+        description: The unique key of the orders mart for England customers.
+        data_tests:
+          - not_null
+          - unique
+      - name: customer_name
+        description: England customers' full name.
+      - name: count_lifetime_orders
+        description: Total number of orders an England customer has ever placed.
+      - name: first_ordered_at
+        description: The timestamp when an England customer placed their first order.
+      - name: last_ordered_at
+        description: The timestamp of an England customer's most recent order.
+      - name: lifetime_spend_pretax
+        description: The sum of all the pre-tax subtotals of every order an England customer has placed.
+      - name: lifetime_tax_paid
+        description: The sum of all the tax portion of every order an England customer has placed.
+      - name: lifetime_spend
+        description: The sum of all the order totals (including tax) that an England customer has ever placed.
+      - name: customer_type
+        description: Options are 'new' or 'returning', indicating if an England customer has ordered more than once or has only placed their first order to date.
+        data_tests:
+          - accepted_values:
+              values: ["new", "returning"]
 
 semantic_models:
   - name: customers
@@ -54,6 +87,8 @@ semantic_models:
         type: time
         type_params:
           time_granularity: day
+      - name: is_england_customer
+        type: categorical
     measures:
       - name: customers
         description: Count of unique customers
@@ -67,6 +102,43 @@ semantic_models:
       - name: lifetime_spend
         agg: sum
         description: Gross customer lifetime spend inclusive of taxes.
+
+  - name: england_customers
+    defaults:
+      agg_time_dimension: first_ordered_at
+    description: |
+      England customer grain mart.
+    model: ref('england_customers')
+    entities:
+      - name: customer
+        expr: customer_id
+        type: primary
+    dimensions:
+      - name: customer_name
+        type: categorical
+      - name: customer_type
+        type: categorical
+      - name: first_ordered_at
+        type: time
+        type_params:
+          time_granularity: day
+      - name: last_ordered_at
+        type: time
+        type_params:
+          time_granularity: day
+    measures:
+      - name: customers
+        description: Count of unique England customers
+        agg: count_distinct
+      - name: count_lifetime_orders
+        description: Total count of orders per England customer.
+        agg: sum
+      - name: lifetime_spend_pretax
+        description: England customer lifetime spend before taxes.
+        agg: sum
+      - name: lifetime_spend
+        agg: sum
+        description: Gross England customer lifetime spend inclusive of taxes.
 
 metrics:
   - name: lifetime_spend_pretax
@@ -102,5 +174,20 @@ saved_queries:
         - Entity('customer')
     exports:
       - name: customer_order_metrics
+        config:
+          export_as: table
+
+  - name: england_customer_order_metrics
+    query_params:
+      metrics:
+        - count_lifetime_orders
+        - lifetime_spend_pretax
+        - average_order_value
+      group_by:
+        - Entity('customer')
+      filters:
+        - Dimension('is_england_customer', 'customers') == True
+    exports:
+      - name: england_customer_order_metrics
         config:
           export_as: table
