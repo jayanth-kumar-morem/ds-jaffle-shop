@@ -1,15 +1,11 @@
 with
 
 source as (
-
     select * from {{ source('ecom', 'raw_orders') }}
-
 ),
 
 renamed as (
-
     select
-
         ----------  ids
         id as order_id,
         store_id as location_id,
@@ -27,7 +23,13 @@ renamed as (
         {{ dbt.date_trunc('day','ordered_at') }} as ordered_at
 
     from source
+),
 
+england_orders as (
+    select r.*
+    from renamed r
+    join {{ ref('stg_customers') }} c on r.customer_id = c.customer_id
+    where c.country = 'England'
 )
 
-select * from renamed
+select * from england_orders
