@@ -45,7 +45,7 @@ semantic_models:
     defaults:
       agg_time_dimension: ordered_at
     description: |
-      Items contatined in each order. The grain of the table is one row per order item.
+      Items contained in each order. The grain of the table is one row per order item.
     model: ref('order_items')
     entities:
       - name: order_item
@@ -62,7 +62,7 @@ semantic_models:
         expr: ordered_at
         type: time
         type_params:
-          time_granularity: day
+          time_granularity: year
       - name: is_food_item
         type: categorical
       - name: is_drink_item
@@ -73,11 +73,11 @@ semantic_models:
         agg: sum
         expr: product_price
       - name: food_revenue
-        description: The revenue generated for each order item. Revenue is calculated as a sum of revenue associated with each product in an order.
+        description: The revenue generated for food items in each order.
         agg: sum
         expr: case when is_food_item is true then product_price else 0 end
       - name: drink_revenue
-        description: The revenue generated for each order item. Revenue is calculated as a sum of revenue associated with each product in an order.
+        description: The revenue generated for drink items in each order.
         agg: sum
         expr: case when is_drink_item is true then product_price else 0 end
       - name: median_revenue
@@ -135,18 +135,18 @@ metrics:
       denominator: revenue
 
   # Derived Metrics
-  - name: revenue_growth_mom
-    description: "Percentage growth of revenue compared to 1 month ago. Excluded tax"
+  - name: revenue_growth_yoy
+    description: "Percentage growth of revenue compared to 1 year ago. Excludes tax"
     type: derived
-    label: Revenue Growth % M/M
+    label: Revenue Growth % Y/Y
     type_params:
-      expr: (current_revenue - revenue_prev_month)*100/revenue_prev_month
+      expr: (current_revenue - revenue_prev_year)*100/revenue_prev_year
       metrics:
         - name: revenue
           alias: current_revenue
         - name: revenue
-          offset_window: 1 month
-          alias: revenue_prev_month
+          offset_window: 1 year
+          alias: revenue_prev_year
   - name: order_gross_profit
     description: Gross profit from each order.
     type: derived
@@ -174,7 +174,7 @@ saved_queries:
         - food_revenue
         - drink_revenue
       group_by:
-        - TimeDimension('metric_time', 'day')
+        - TimeDimension('metric_time', 'year')
     exports:
       - name: revenue_metrics
         config:
