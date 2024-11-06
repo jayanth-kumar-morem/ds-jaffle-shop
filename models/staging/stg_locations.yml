@@ -7,6 +7,10 @@ models:
         data_tests:
           - not_null
           - unique
+      - name: country
+        description: The country where the location is situated.
+        data_tests:
+          - not_null
 
 unit_tests:
   - name: test_does_location_opened_at_trunc_to_date
@@ -20,12 +24,14 @@ unit_tests:
               name: "Vice City",
               tax_rate: 0.2,
               opened_at: "2016-09-01T00:00:00",
+              country: "USA"
             }
           - {
               id: 2,
               name: "San Andreas",
               tax_rate: 0.1,
               opened_at: "2079-10-27T23:59:59.9999",
+              country: "England"
             }
     expect:
       rows:
@@ -34,10 +40,57 @@ unit_tests:
             location_name: "Vice City",
             tax_rate: 0.2,
             opened_date: "2016-09-01",
+            country: "USA"
           }
         - {
             location_id: 2,
             location_name: "San Andreas",
             tax_rate: 0.1,
             opened_date: "2079-10-27",
+            country: "England"
           }
+
+  - name: test_england_locations
+    description: "Check that only England locations are included when filtered"
+    model: stg_locations
+    given:
+      - input: source('ecom', 'raw_stores')
+        rows:
+          - {
+              id: 1,
+              name: "London Store",
+              tax_rate: 0.2,
+              opened_at: "2016-09-01T00:00:00",
+              country: "England"
+            }
+          - {
+              id: 2,
+              name: "New York Store",
+              tax_rate: 0.1,
+              opened_at: "2017-10-27T23:59:59.9999",
+              country: "USA"
+            }
+          - {
+              id: 3,
+              name: "Manchester Store",
+              tax_rate: 0.2,
+              opened_at: "2018-05-15T12:30:00",
+              country: "England"
+            }
+    expect:
+      rows:
+        - {
+            location_id: 1,
+            location_name: "London Store",
+            tax_rate: 0.2,
+            opened_date: "2016-09-01",
+            country: "England"
+          }
+        - {
+            location_id: 3,
+            location_name: "Manchester Store",
+            tax_rate: 0.2,
+            opened_date: "2018-05-15",
+            country: "England"
+          }
+    where: "country = 'England'"
