@@ -7,3 +7,21 @@ models:
         data_tests:
           - not_null
           - unique
+      - name: country
+        description: The country where the customer is located.
+        data_tests:
+          - not_null
+
+  - name: stg_customers_england
+    description: Customer data for customers located in England.
+    columns:
+      - name: customer_id
+        description: The unique key for each customer in England.
+        data_tests:
+          - not_null
+          - unique
+      - name: country
+        description: Should always be 'England' for this model.
+        data_tests:
+          - accepted_values:
+              values: ['England']
