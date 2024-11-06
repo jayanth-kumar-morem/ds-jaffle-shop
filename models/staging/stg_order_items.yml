@@ -14,3 +14,19 @@ models:
           - relationships:
               to: ref('stg_orders')
               field: order_id
+
+  - name: stg_order_items_england
+    description: Individual food and drink items that make up orders from customers located in England, one row per item.
+    columns:
+      - name: order_item_id
+        description: The unique key for each order item from England-based customers.
+        data_tests:
+          - not_null
+          - unique
+      - name: order_id
+        description: The corresponding order each order item belongs to, for England-based customers
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders_england')
+              field: order_id
